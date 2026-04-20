@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="config-nvim — Neovim configuration banner" width="100%">
+  <img src="assets/alpha.png" alt="config-nvim — Neovim configuration banner" width="100%">
 </p>
 
 <p align="center">
@@ -19,9 +19,7 @@ A modular Neovim setup written in Lua, managed with [lazy.nvim](https://github.c
 
 | Start screen (alpha-nvim) | Typical layout (tree + editor) |
 | :---: | :---: |
-| ![Stylized alpha dashboard preview](assets/preview-dashboard.svg) | ![Stylized editor layout preview](assets/preview-editor.svg) |
-
-These are **vector previews** so the README looks good on GitHub without binary screenshots. You can replace `assets/preview-*.svg` (or add PNG/WebP) with real captures from your machine.
+| ![Stylized Neo-tree preview](assets/neo-tree.png) | ![Stylized Telescope find file preview](assets/telescope.png) |
 
 ---
 
