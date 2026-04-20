@@ -1,108 +1,135 @@
-# Neovim Configuration
+<p align="center">
+  <img src="assets/banner.svg" alt="config-nvim — Neovim configuration banner" width="100%">
+</p>
 
-This repository contains a modular, plugin-based Neovim configuration written in Lua. It leverages [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management and aims to provide a modern, productive, and visually appealing development environment.
+<p align="center">
+  <a href="https://neovim.io/"><img src="https://img.shields.io/badge/Neovim-57A143?style=flat&logo=neovim&logoColor=white" alt="Neovim"></a>
+  <a href="https://www.lua.org/"><img src="https://img.shields.io/badge/Lua-2C2D72?style=flat&logo=lua&logoColor=white" alt="Lua"></a>
+  <a href="https://github.com/folke/lazy.nvim"><img src="https://img.shields.io/badge/plugin%20manager-lazy.nvim-6272a4?style=flat" alt="lazy.nvim"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat" alt="MIT License"></a>
+</p>
+
+# Neovim configuration (`config-nvim`)
+
+A modular Neovim setup written in Lua, managed with [lazy.nvim](https://github.com/folke/lazy.nvim). It focuses on a fast editing workflow: LSP, Telescope, Neo-tree (floating), Git tooling, formatting with Conform, and a Dracula-based UI—with extra niceties for Ruby on Rails (vim-rails + a custom routes helper).
+
+---
+
+## Preview
+
+| Start screen (alpha-nvim) | Typical layout (tree + editor) |
+| :---: | :---: |
+| ![Stylized alpha dashboard preview](assets/preview-dashboard.svg) | ![Stylized editor layout preview](assets/preview-editor.svg) |
+
+These are **vector previews** so the README looks good on GitHub without binary screenshots. You can replace `assets/preview-*.svg` (or add PNG/WebP) with real captures from your machine.
+
+---
 
 ## Features
 
-- **Plugin Management:** Uses `lazy.nvim` for fast, lazy-loaded plugin management.
-- **LSP Support:** Pre-configured Language Server Protocol (LSP) support for many languages (TypeScript, Python, SQL, YAML, Docker, HTML, CSS, Bash, Ansible, Markdown, Nginx, and more).
-- **Autocompletion:** Powered by `nvim-cmp` with snippet support via `LuaSnip`.
-- **Fuzzy Finder:** Integrated `telescope.nvim` for searching files, buffers, help, and more.
-- **File Explorer:** `neo-tree.nvim` for a modern file tree with git integration.
-- **Statusline & Bufferline:** Beautiful statusline (`lualine.nvim`) and bufferline (`bufferline.nvim`).
-- **Syntax Highlighting:** `nvim-treesitter` for advanced syntax highlighting and code navigation.
-- **Formatting & Linting:** Automatic formatting with `conform.nvim` and LSP-based diagnostics.
-- **Git Integration:** `gitsigns.nvim`, `vim-fugitive`, and `lazygit.nvim` for powerful git workflows.
-- **UI Enhancements:** `noice.nvim` for improved notifications and command line, `which-key.nvim` for keybinding hints, and more.
-- **Color Theme:** Uses the `onedark.nvim` theme with transparent background support.
-- **Miscellaneous:** Includes plugins for autopairs, color highlighting, todo comments, and more.
+- **Plugin management:** lazy.nvim with a lockfile (`lazy-lock.json`).
+- **Theme:** [dracula.nvim](https://github.com/Mofiqul/dracula.nvim) (`colorscheme dracula`).
+- **LSP & completion:** `nvim-lspconfig`, Mason, `nvim-cmp`, LuaSnip, Fidget.
+- **Navigation:** Telescope (with `fzf-native` when `make` is available), `which-key`, vim-tmux-navigator.
+- **UI:** alpha-nvim dashboard, bufferline, lualine, neo-tree (float), noice, indent-blankline.
+- **Editing:** Treesitter, nvim-autopairs, nvim-ts-autotag, conform.nvim, comment toggles via todo-comments, nvim-colorizer.
+- **Git:** gitsigns, vim-fugitive, vim-rhubarb, lazygit.nvim.
+- **Sessions:** rmagatti/auto-session (restore last session, autosave).
+- **Rails / Ruby:** vim-rails; `<leader>rr` runs a custom helper to show routes for the current controller (`lua/customs/show-rails-route.lua`).
+- **Other:** toggleterm, vim-sleuth; **auto-save on `InsertLeave`** when the buffer is modified (see `init.lua`).
 
-## Directory Structure
+Per-language LSP tweaks live under [`lua/plugins/lsp-configs/`](lua/plugins/lsp-configs/) (TypeScript, Tailwind, Ruby LSP, YAML, Docker, Ansible, Bash, Markdown, Nginx, SQL, HTML, JSON, CSS, etc.).
+
+---
+
+## Repository layout
 
 ```
 init.lua
 lua/
   core/
-    keymaps.lua
-    options.lua
+    keymaps.lua      # Global keymaps, diagnostics, format
+    options.lua      # Options (clipboard, tabs, folds, …)
+  customs/
+    show-buffers.lua # Telescope buffer popup (<leader>fb)
+    show-rails-route.lua
   plugins/
-    <plugin-configs>.lua
-    lsp-configs/
-      <lsp-server>.lua
+    *.lua            # Plugin specs & config
+    lsp-configs/     # Per-tool LSP settings
 lazy-lock.json
+assets/              # README images (banner + previews)
 ```
 
-- `init.lua`: Entry point, loads core settings and plugins.
-- `lua/core/`: Editor options and keymaps.
-- `lua/plugins/`: Plugin specifications and configurations.
-- `lua/plugins/lsp-configs/`: Per-language LSP server configurations.
-- `lazy-lock.json`: Plugin lockfile (auto-generated).
+- **`init.lua`:** Bootstraps lazy.nvim, loads core modules, registers plugins and custom autocmds.
+- **`lua/core/`:** Editor options and mappings shared across the config.
+- **`lua/plugins/`:** One file per concern (or small groups); LSP overrides in `lsp-configs/`.
+- **`lua/customs/`:** Small Lua utilities used from `init.lua` or keymaps.
+
+---
+
+## Requirements
+
+- **Neovim** 0.9+ recommended (uses `vim.lsp` APIs and Lua stdlib).
+- A **Nerd Font** in the terminal for icons (web-devicons, bufferline, etc.).
+- **Git**, **curl** or system tools as needed for Mason/LSP binaries.
+- Optional: **`make`** for building `telescope-fzf-native`; **`lazygit`** on `$PATH` for the LazyGit integration.
+
+---
 
 ## Installation
 
-1. **Clone this repository** into your Neovim config directory:
+1. **Clone** into your config directory (backup any existing `~/.config/nvim` first):
 
    ```sh
-   git clone <this-repo-url> ~/.config/nvim
+   git clone https://github.com/chickenHuy/config-nvim.git ~/.config/nvim
    ```
 
-2. **Start Neovim**. The configuration will automatically bootstrap [lazy.nvim](https://github.com/folke/lazy.nvim) and install all plugins.
+2. **Start Neovim.** lazy.nvim bootstraps and installs plugins on first run.
 
-3. **Install LSP servers and formatters**  
-   Most language servers and formatters are managed via [mason.nvim](https://github.com/williamboman/mason.nvim).  
-   Open Neovim and run:
+3. **Mason / LSP tools:** Run `:Mason` to install language servers and formatters you need.
 
-   ```
-   :Mason
-   ```
+4. **Optional:** Install host tools (Node, Ruby, Python, etc.) required by specific servers—see each file under `lua/plugins/lsp-configs/`.
 
-   to install or manage external tools.
+---
 
-4. **(Optional) Install additional dependencies**  
-   Some language servers require external installation (e.g., via `npm`, `pip`). See the documentation in `lua/plugins/lsp-configs/` for details.
+## Usage highlights
 
-## Usage
+| Topic | Keys / notes |
+| --- | --- |
+| **Neo-tree** | `\` reveal current file; `<leader>nt` toggle float + reveal; `<leader>nb` buffers; `<leader>ng` git status |
+| **Telescope** | `<leader>ff` files; `<leader>fg` live grep; `<leader><leader>` buffers; `<leader>f.` recent files; `<leader>/` fuzzy find in buffer |
+| **Buffers (BufferLine)** | `<Tab>` / `<S-Tab>` next/prev; `<leader>bd` delete; `<leader>bc` close others; `<leader>bp` / `<leader>bn` cycle |
+| **LSP (buffer-local)** | `<leader>gd` definition; `<leader>gi` implementation; `<leader>gD` declaration; `<leader>gt` type def; `<leader>gs` / `<leader>gw` symbols; `<leader>gr` rename; `<leader>ga` code action; `<leader>th` toggle inlay hints |
+| **Diagnostics** | `<leader>dp` / `<leader>dn` prev/next; `<leader>dt` float; `<leader>dl` loclist |
+| **Format** | `<leader>fm` (Conform) |
+| **Git (LazyGit)** | `<leader>lt` open; `<leader>lc` current file; `<leader>lf` / `<leader>lF` filters |
+| **Rails** | `<leader>rr` routes for current controller |
+| **Custom** | `<leader>fb` buffer picker popup |
 
-- **File Explorer:**  
-  - Toggle: `<leader>e`
-  - Reveal current file: `\`
-- **Fuzzy Finder:**  
-  - Find files: `<leader>ff`
-  - Live grep: `<leader>fg`
-- **Buffer Navigation:**  
-  - Next buffer: `<Tab>`
-  - Previous buffer: `<S-Tab>`
-  - Close buffer: `<leader>x`
-- **LSP:**  
-  - Go to definition: `gd`
-  - References: `gr`
-  - Rename: `<leader>rn`
-  - Code action: `<leader>ca`
-- **Formatting:**  
-  - Format file: `<leader>fm`
-- **Git:**  
-  - Open LazyGit: `<leader>lg`
-  - Git status in Neo-tree: `<leader>ngs`
-- **Keybinding Help:**  
-  - Show available keybindings: (wait for which-key popup after pressing `<leader>`)
+Press `<leader>` and pause to see **which-key** hints (leader is **space**).
+
+---
 
 ## Customization
 
-- **Add/Remove Plugins:**  
-  Edit files in [`lua/plugins/`](lua/plugins/) to add or remove plugins.
-- **LSP Servers:**  
-  Add new LSP configs in [`lua/plugins/lsp-configs/`](lua/plugins/lsp-configs/).
-- **Keymaps & Options:**  
-  Edit [`lua/core/keymaps.lua`](lua/core/keymaps.lua) and [`lua/core/options.lua`](lua/core/options.lua).
+- **Plugins:** Add or edit files under [`lua/plugins/`](lua/plugins/).
+- **LSP:** Extend [`lua/plugins/lsp.lua`](lua/plugins/lsp.lua) and [`lua/plugins/lsp-configs/`](lua/plugins/lsp-configs/).
+- **Keys & options:** [`lua/core/keymaps.lua`](lua/core/keymaps.lua), [`lua/core/options.lua`](lua/core/options.lua).
 
-## Updating
+---
 
-To update plugins, run:
+## Updating plugins
+
+Inside Neovim:
 
 ```
 :Lazy update
 ```
 
+---
+
 ## License
 
-CHICKEN >.<
+This project is released under the [MIT License](LICENSE). You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the conditions in that file.
+
+Third-party plugins and tools installed by lazy.nvim or Mason remain under their respective licenses; this license applies to the configuration and Lua files in this repository only.
