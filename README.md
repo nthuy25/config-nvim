@@ -17,7 +17,7 @@ A modular Neovim setup written in Lua, managed with [lazy.nvim](https://github.c
 
 ## Preview
 
-| Start screen (alpha-nvim) | Typical layout (tree + editor) |
+| Neo-tree preview | Telescope find file preview |
 | :---: | :---: |
 | ![Stylized Neo-tree preview](assets/neo-tree.png) | ![Stylized Telescope find file preview](assets/telescope.png) |
 
