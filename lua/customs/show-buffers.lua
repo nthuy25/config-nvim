@@ -63,24 +63,34 @@ function M.ShowBufferPopup()
 					api.nvim_buf_set_option(self.state.bufnr, "filetype", vim.bo[entry.bufnr].filetype)
 				end,
 			}),
+
 			attach_mappings = function(_, map)
+				local state = require("telescope.actions.state")
+
+				map("i", "<Tab>", actions.move_selection_next)
+				map("i", "<S-Tab>", actions.move_selection_previous)
+
 				map("i", "<CR>", function(prompt_bufnr)
-					local selection = require("telescope.actions.state").get_selected_entry()
-					require("telescope.actions").close(prompt_bufnr)
-					api.nvim_set_current_buf(selection.bufnr)
+					local selection = state.get_selected_entry()
+					actions.close(prompt_bufnr)
+					vim.api.nvim_set_current_buf(selection.bufnr)
 				end)
+
 				map("i", "<C-d>", function(prompt_bufnr)
-					local selection = require("telescope.actions.state").get_selected_entry()
+					local selection = state.get_selected_entry()
 					if not selection or not selection.bufnr then
 						vim.notify("No buffer selected", vim.log.levels.ERROR)
 						return
 					end
+
 					vim.api.nvim_buf_delete(selection.bufnr, { force = true })
-					require("telescope.actions").close(prompt_bufnr)
+					actions.close(prompt_bufnr)
 					vim.notify("Buffer " .. selection.bufnr .. " deleted", vim.log.levels.INFO)
 				end)
+
 				map("i", "<C-j>", actions.preview_scrolling_down)
 				map("i", "<C-k>", actions.preview_scrolling_up)
+
 				return true
 			end,
 			layout_strategy = "horizontal",

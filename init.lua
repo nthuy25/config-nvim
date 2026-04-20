@@ -1,6 +1,7 @@
 require("core.keymaps")
 require("core.options")
 
+-- Init - clone Lazy Nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -9,10 +10,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 		error("Error cloning lazy.nvim:\n" .. out)
 	end
 end
-
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 
+-- Setup plugins
 require("lazy").setup({
 	{
 		"nvim-neo-tree/neo-tree.nvim",
@@ -25,7 +26,7 @@ require("lazy").setup({
 		lazy = false,
 		opts = {
 			window = {
-				position = "left",
+				position = "float",
 				width = 30,
 			},
 			filesystem = {
@@ -52,12 +53,13 @@ require("lazy").setup({
 	require("plugins.noice"),
 	require("plugins.lazygit"),
 	require("plugins.toggleterm"),
+	require("plugins.autopair"),
+	require("plugins.autotag"),
+	require("plugins.auto-session"),
+	require("plugins.rails"),
 })
 
-local buffer_popup = require("customs.show-buffers")
-vim.keymap.set("n", "<leader>fb", buffer_popup.ShowBufferPopup, { desc = "Show buffer popup" })
-
-
+-- Setup custom functions
 vim.api.nvim_create_autocmd("InsertLeave", {
 	pattern = "*",
 	callback = function()
@@ -66,3 +68,7 @@ vim.api.nvim_create_autocmd("InsertLeave", {
 		end
 	end,
 })
+
+-- Setup custom functions
+local rails_routes = require("customs.show-rails-route")
+vim.keymap.set("n", "<leader>rr", rails_routes.show_routes_for_controller, { desc = "Rails: Show routes of controller"} )

@@ -35,17 +35,27 @@
 --   end
 -- }
 --
+-- return {
+-- 	"folke/tokyonight.nvim",
+-- 	lazy = false,
+-- 	priority = 1000,
+-- 	opts = {
+-- 		style = "moon",
+-- 		transparent = false,
+-- 	},
+--
+-- 	config = function(_, opts)
+-- 		require("tokyonight").setup(opts)
+-- 		vim.cmd.colorscheme("tokyonight")
+-- 	end,
+-- }
+--
 return {
-	"folke/tokyonight.nvim",
+	"Mofiqul/dracula.nvim",
 	lazy = false,
 	priority = 1000,
-	opts = {
-		style = "night",
-		transparent = false,
-	},
 
-	config = function(_, opts)
-		require("tokyonight").setup(opts)
-		vim.cmd.colorscheme("tokyonight")
+	config = function()
+		vim.cmd.colorscheme("dracula")
 	end,
 }

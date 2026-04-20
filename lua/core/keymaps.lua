@@ -1,75 +1,59 @@
--- Set leader key
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
--- Disable the spacebar key's default behavior in Normal and Visual modes
-vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
--- For conciseness
 local opts = { noremap = true, silent = true }
 
--- save file
-vim.keymap.set('n', '<C-s>', '<cmd> w <CR>', opts)
+vim.keymap.set({ "n", "v" }, "x", '"_x', opts)
 
--- save file without auto-formatting
-vim.keymap.set('n', '<leader>sn', '<cmd>noautocmd w <CR>', opts)
+vim.keymap.set("n", "<C-d>", "<C-d>zz", opts)
+vim.keymap.set("n", "<C-u>", "<C-u>zz", opts)
 
--- quit file
-vim.keymap.set('n', '<C-q>', '<cmd> q <CR>', opts)
+vim.keymap.set("n", "n", "nzzzv", opts)
+vim.keymap.set("n", "N", "Nzzzv", opts)
 
--- delete single character without copying into register
-vim.keymap.set({'n', 'v'}, 'x', '"_x', opts)
+vim.keymap.set("n", "<Up>", ":resize -2<CR>", opts)
+vim.keymap.set("n", "<Down>", ":resize +2<CR>", opts)
+vim.keymap.set("n", "<Left>", ":vertical resize -2<CR>", opts)
+vim.keymap.set("n", "<Right>", ":vertical resize +2<CR>", opts)
 
--- Vertical scroll and center
-vim.keymap.set('n', '<C-d>', '<C-d>zz', opts)
-vim.keymap.set('n', '<C-u>', '<C-u>zz', opts)
+vim.keymap.set("n", "<Tab>", ":bnext<CR>", opts)
+vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>", opts)
 
--- Find and center
-vim.keymap.set('n', 'n', 'nzzzv', opts)
-vim.keymap.set('n', 'N', 'Nzzzv', opts)
+vim.keymap.set("v", "<", "<gv", opts)
+vim.keymap.set("v", ">", ">gv", opts)
 
--- Resize with arrows
-vim.keymap.set('n', '<Up>', ':resize -2<CR>', opts)
-vim.keymap.set('n', '<Down>', ':resize +2<CR>', opts)
-vim.keymap.set('n', '<Left>', ':vertical resize -2<CR>', opts)
-vim.keymap.set('n', '<Right>', ':vertical resize +2<CR>', opts)
+vim.keymap.set("v", "p", '"_dP', opts)
 
--- Buffers
-vim.keymap.set('n', '<Tab>', ':bnext<CR>', opts)
-vim.keymap.set('n', '<S-Tab>', ':bprevious<CR>', opts)
-vim.keymap.set('n', '<leader>x', ':bdelete!<CR>', opts) -- close buffer
-vim.keymap.set('n', '<leader>b', '<cmd> enew <CR>', opts) -- new buffer
+vim.keymap.set("n", "<leader>dp", function()
+  vim.diagnostic.jump({ count = -1 })
+end, { desc = "Diagnostic: Previous message" })
 
--- Window management
-vim.keymap.set('n', '<leader>v', '<C-w>v', opts) -- split window vertically
-vim.keymap.set('n', '<leader>h', '<C-w>s', opts) -- split window horizontally
+vim.keymap.set("n", "<leader>dn", function()
+  vim.diagnostic.jump({ count = 1 })
+end, { desc = "Diagnostic: Next message" })
 
--- Navigate between splits
-vim.keymap.set('n', '<C-k>', ':wincmd k<CR>', opts)
-vim.keymap.set('n', '<C-j>', ':wincmd j<CR>', opts)
-vim.keymap.set('n', '<C-h>', ':wincmd h<CR>', opts)
-vim.keymap.set('n', '<C-l>', ':wincmd l<CR>', opts)
+vim.keymap.set("n", "<leader>dt", vim.diagnostic.open_float, {
+  desc = "Diagnostic: Float open",
+})
 
--- Tabs
-vim.keymap.set('n', '<leader>to', ':tabnew<CR>', opts) -- open new tab
-vim.keymap.set('n', '<leader>tx', ':tabclose<CR>', opts) -- close current tab
-vim.keymap.set('n', '<leader>tn', ':tabn<CR>', opts) --  go to next tab
-vim.keymap.set('n', '<leader>tp', ':tabp<CR>', opts) --  go to previous tab
+vim.keymap.set("n", "<leader>dl", vim.diagnostic.setloclist, {
+  desc = "Diagnostic: List diagnostic",
+})
 
--- Toggle line wrapping
-vim.keymap.set('n', '<leader>lw', '<cmd>set wrap!<CR>', opts)
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>fm",
+	"<cmd>lua require('conform').format({ async = true })<CR>",
+	{ noremap = true, silent = true, desc = "Format document with Conform" }
+)
 
--- Stay in indent mode
-vim.keymap.set('v', '<', '<gv', opts)
-vim.keymap.set('v', '>', '>gv', opts)
+vim.keymap.set("n", "<leader>fb", function()
+	require("customs.show-buffers").ShowBufferPopup()
+end, { desc = "Telescope: Show buffers popup" })
 
--- Keep last yanked when pasting
-vim.keymap.set('v', 'p', '"_dP', opts)
-
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
-
-vim.api.nvim_set_keymap("n", "<leader>fm", "<cmd>lua require('conform').format({ async = true })<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>bp", "<Cmd>BufferLineCyclePrev<CR>", { desc = "BufferLine: Cycle left" })
+vim.keymap.set("n", "<leader>bn", "<Cmd>BufferLineCycleNext<CR>", { desc = "BufferLine: Cycle right" })
+vim.keymap.set("n", "<leader>bd", "<Cmd>Bdelete<CR>", { desc = "BufferLine: Buffer delete" })
+vim.keymap.set("n", "<leader>bc", "<Cmd>BufferLineCloseOthers<CR>", { desc = "BufferLine: Close others" })
