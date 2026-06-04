@@ -1,5 +1,8 @@
+local colors = require("core.colors")
+
 return {
-  'nvim-lualine/lualine.nvim',
+  "nvim-lualine/lualine.nvim",
+  dependencies = { "Mofiqul/dracula.nvim" },
   config = function()
     local mode = {
       'mode',
@@ -39,8 +42,7 @@ return {
     require('lualine').setup {
       options = {
         icons_enabled = true,
-        theme = 'dracula',
-        -- theme = 'onedark', -- Set theme based on environment variable
+        theme = colors.lualine(),
         -- Some useful glyphs:
         -- https://www.nerdfonts.com/cheat-sheet
         --        

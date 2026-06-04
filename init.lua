@@ -15,30 +15,8 @@ rtp:prepend(lazypath)
 
 -- Setup plugins
 require("lazy").setup({
-	{
-		"nvim-neo-tree/neo-tree.nvim",
-		branch = "v3.x",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-tree/nvim-web-devicons",
-			"MunifTanjim/nui.nvim",
-		},
-		lazy = false,
-		opts = {
-			window = {
-				position = "float",
-				width = 30,
-			},
-			filesystem = {
-				filtered_items = {
-					hide_dotfiles = false,
-				},
-			},
-		},
-	},
 	require("plugins.colortheme"),
 	require("plugins.neotree"),
-	require("plugins.bufferline"),
 	require("plugins.lualine"),
 	require("plugins.treesitter"),
 	require("plugins.telescope"),
@@ -51,6 +29,7 @@ require("lazy").setup({
 	require("plugins.alpha"),
 	require("plugins.indent-blankline"),
 	require("plugins.noice"),
+	require("plugins.bufferline"),
 	require("plugins.lazygit"),
 	require("plugins.toggleterm"),
 	require("plugins.autopair"),

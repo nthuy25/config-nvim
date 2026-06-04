@@ -26,7 +26,7 @@ A modular Neovim setup written in Lua, managed with [lazy.nvim](https://github.c
 ## Features
 
 - **Plugin management:** lazy.nvim with a lockfile (`lazy-lock.json`).
-- **Theme:** [dracula.nvim](https://github.com/Mofiqul/dracula.nvim) (`colorscheme dracula`).
+- **Theme:** Custom Dracula palette (`#131313` background) via [dracula.nvim](https://github.com/Mofiqul/dracula.nvim) + centralized colors in `lua/core/colors.lua` (Neo-tree, Lualine, Noice, Bufferline).
 - **LSP & completion:** `nvim-lspconfig`, Mason, `nvim-cmp`, LuaSnip, Fidget.
 - **Navigation:** Telescope (with `fzf-native` when `make` is available), `which-key`, vim-tmux-navigator.
 - **UI:** alpha-nvim dashboard, bufferline, lualine, neo-tree (float), noice, indent-blankline.
@@ -46,6 +46,7 @@ Per-language LSP tweaks live under [`lua/plugins/lsp-configs/`](lua/plugins/lsp-
 init.lua
 lua/
   core/
+    colors.lua       # Single source of truth for the color palette
     keymaps.lua      # Global keymaps, diagnostics, format
     options.lua      # Options (clipboard, tabs, folds, …)
   customs/
@@ -108,8 +109,101 @@ Press `<leader>` and pause to see **which-key** hints (leader is **space**).
 
 ---
 
+## Color theme
+
+This config uses a **custom Dracula-style palette** aligned with the terminal colors below—not the default dracula.nvim background (`#282A36`). All UI plugins read from one module: [`lua/core/colors.lua`](lua/core/colors.lua).
+
+### Palette
+
+| Role | Hex | ANSI / notes |
+| --- | --- | --- |
+| Background | `#131313` | Editor, active tab, popups |
+| Foreground | `#FCFCFC` | Default text |
+| Selection bg / fg | `#252525` / `#50FA7B` | Visual, PmenuSel |
+| Cursor / cursor text | `#FCFCFC` / `#131313` | |
+| Surface | `#1b1b1b` | Statusline, cursor line, Lualine sections |
+| Menu | `#21222C` | Pmenu, Neo-tree panels (color0) |
+| Comment | `#6272A4` | Line numbers, muted text (color8) |
+| Red / Green / Yellow | `#FF5555` / `#50FA7B` / `#F1FA8C` | |
+| Purple / Pink / Cyan | `#BD93F9` / `#FF79C6` / `#8BE9FD` | |
+| Bright variants | `#FF6E6E` … `#FFFFFF` | ANSI 9–15 |
+
+Terminal colors are applied with `g.terminal_color_*` in `colors.apply_terminal()` so Neovim terminals (e.g. toggleterm) match the same scheme.
+
+### Architecture
+
+```
+Terminal / user palette
+        ↓
+lua/core/colors.lua          ← edit colors here only
+        ↓
+┌─────────────────────┬──────────────────────────┬─────────────────────┐
+│ colortheme.lua      │ patch + apply_*()        │ plugin configs      │
+│ dracula + overrides │ (neo-tree, noice)        │ lualine, bufferline │
+└─────────────────────┴──────────────────────────┴─────────────────────┘
+```
+
+| File | Purpose |
+| --- | --- |
+| [`lua/core/colors.lua`](lua/core/colors.lua) | Palette constants; `dracula()`, `apply_terminal()`, `apply_neotree()`, `apply_noice()`, `bufferline()`, `lualine()` |
+| [`lua/plugins/colortheme.lua`](lua/plugins/colortheme.lua) | Loads Dracula with `colors.dracula()` and **overrides** (Normal, Telescope, cmp, BufferLine*, Noice*, …) |
+| [`lua/plugins/neotree.lua`](lua/plugins/neotree.lua) | Patches neo-tree `highlights.setup` + refresh on window open |
+| [`lua/plugins/noice.lua`](lua/plugins/noice.lua) | Patches noice highlights; cmdline/search popup uses `NoiceCmdlinePopup` |
+| [`lua/plugins/lualine.lua`](lua/plugins/lualine.lua) | `theme = colors.lualine()` (not the built-in `dracula` theme) |
+| [`lua/plugins/bufferline.lua`](lua/plugins/bufferline.lua) | `highlights` function merges `colors.bufferline()` into plugin defaults |
+
+`colortheme.lua` loads first (`lazy = false`, `priority = 1000`).
+
+### Per-plugin behavior
+
+**Neo-tree** — Neo-tree resets highlights with hardcoded colors on setup and `ColorScheme`. Fix: `patch_neotree_highlights()` wraps `highlights.setup` and re-applies `apply_neotree()` with `highlight!`. Events on window open / buffer enter keep float `winhighlight` in sync.
+
+**Lualine** — Built-in Lualine theme `dracula` uses `#282a36`. Fix: custom theme table from `colors.lualine()` (mode colors: purple / green / pink / yellow / cyan on `#1b1b1b`).
+
+**Noice** (`/` search popup) — Noice links `NoiceCmdlinePopup` to `Normal` after load. Fix: `patch_noice_highlights()` + explicit `NoiceCmdlinePopup` background `#131313` in `cmdline_popup` winhighlight.
+
+**Bufferline** — Derives colors from the colorscheme; icon highlights inherit **parent** `bg` (`buffer`, `buffer_visible`, `background`). Unselected tabs use `#131313`; tab bar fill uses `#21222C`. Highlights are merged via:
+
+```lua
+highlights = function(defaults)
+  return vim.tbl_deep_extend("force", defaults.highlights, colors.bufferline())
+end
+```
+
+(Only `defaults.highlights` must be merged—not the full defaults table.)
+
+### Change colors
+
+1. Edit hex values in [`lua/core/colors.lua`](lua/core/colors.lua).
+2. Restart Neovim, or reload:
+
+   | Plugin | Command |
+   | --- | --- |
+   | Neo-tree | `:lua require("core.colors").apply_neotree()` |
+   | Noice | `:lua require("core.colors").apply_noice()` |
+   | Bufferline | `:BufferlineReload` |
+   | Full theme | `:colorscheme dracula` |
+
+3. For a new plugin that overrides highlights after colorscheme, add groups to `colortheme.lua` `overrides` and/or an `apply_*()` + patch pattern like neo-tree/noice.
+
+---
+
+## Giao diện màu (Tiếng Việt)
+
+Cấu hình dùng **bảng màu Dracula tùy chỉnh** (nền `#131313`), đồng bộ với terminal—not theme Dracula mặc định. Mọi màu khai báo tập trung tại [`lua/core/colors.lua`](lua/core/colors.lua).
+
+- **Sửa màu:** chỉnh file `colors.lua`, restart Neovim hoặc dùng lệnh reload trong bảng trên.
+- **Neo-tree / Noice:** plugin tự ghi đè highlight → dùng `patch_*` + `apply_*()` để giữ đúng palette.
+- **Lualine:** dùng `colors.lualine()`, không dùng theme `dracula` sẵn có của Lualine.
+- **Bufferline:** tab không chọn và **icon** cùng nền `#131313`; vùng `fill` tabline là `#21222C`.
+
+Chi tiết kỹ thuật và bảng màu đầy đủ: mục [Color theme](#color-theme) phía trên.
+
+---
+
 ## Customization
 
+- **Colors:** [`lua/core/colors.lua`](lua/core/colors.lua) (palette); [`lua/plugins/colortheme.lua`](lua/plugins/colortheme.lua) (Dracula overrides).
 - **Plugins:** Add or edit files under [`lua/plugins/`](lua/plugins/).
 - **LSP:** Extend [`lua/plugins/lsp.lua`](lua/plugins/lsp.lua) and [`lua/plugins/lsp-configs/`](lua/plugins/lsp-configs/).
 - **Keys & options:** [`lua/core/keymaps.lua`](lua/core/keymaps.lua), [`lua/core/options.lua`](lua/core/options.lua).

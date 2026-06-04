@@ -27,6 +27,9 @@ return {
 		},
 	},
 	config = function()
+		local colors = require("core.colors")
+		colors.patch_neotree_highlights()
+
 		-- If you want icons for diagnostic errors, you'll need to define them somewhere:
 		vim.diagnostic.config({
 			signs = {
@@ -313,6 +316,10 @@ return {
 				},
 			},
 		})
+
+		colors.apply_neotree()
+		colors.setup_neotree_events()
+
 		vim.cmd([[nnoremap \ :Neotree reveal<cr>]])
 
 		vim.keymap.set("n", "<leader>nt", function()

@@ -1,14 +1,15 @@
+local colors = require("core.colors")
+
 return {
 	"folke/noice.nvim",
 	event = "VeryLazy",
-	opts = {
-		-- add any options here
-	},
 	dependencies = {
 		"MunifTanjim/nui.nvim",
 		"rcarriga/nvim-notify",
 	},
 	config = function()
+		colors.patch_noice_highlights()
+
 		require("noice").setup({
 			lsp = {
 				override = {
@@ -18,16 +19,33 @@ return {
 				},
 			},
 			presets = {
-				bottom_search = false, -- use a classic bottom cmdline for search
-				command_palette = true, -- position the cmdline and popupmenu together
-				long_message_to_split = true, -- long messages will be sent to a split
-				inc_rename = false, -- enables an input dialog for inc-rename.nvim
-				lsp_doc_border = false, -- add a border to hover docs and signature help
+				bottom_search = false,
+				command_palette = true,
+				long_message_to_split = true,
+				inc_rename = false,
+				lsp_doc_border = false,
+			},
+			views = {
+				cmdline_popup = {
+					border = {
+						style = "rounded",
+						padding = { 0, 1 },
+					},
+					win_options = {
+						winhighlight = {
+							Normal = "NoiceCmdlinePopup",
+							FloatBorder = "NoiceCmdlinePopupBorder",
+							FloatTitle = "NoiceCmdlinePopupTitle",
+						},
+					},
+				},
 			},
 		})
 
+		colors.apply_noice()
+
 		require("notify").setup({
-			background_colour = "#1f1f1f",
+			background_colour = colors.surface,
 		})
 	end,
 }
