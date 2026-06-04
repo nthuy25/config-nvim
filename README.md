@@ -188,19 +188,6 @@ end
 
 ---
 
-## Giao diện màu (Tiếng Việt)
-
-Cấu hình dùng **bảng màu Dracula tùy chỉnh** (nền `#131313`), đồng bộ với terminal—not theme Dracula mặc định. Mọi màu khai báo tập trung tại [`lua/core/colors.lua`](lua/core/colors.lua).
-
-- **Sửa màu:** chỉnh file `colors.lua`, restart Neovim hoặc dùng lệnh reload trong bảng trên.
-- **Neo-tree / Noice:** plugin tự ghi đè highlight → dùng `patch_*` + `apply_*()` để giữ đúng palette.
-- **Lualine:** dùng `colors.lualine()`, không dùng theme `dracula` sẵn có của Lualine.
-- **Bufferline:** tab không chọn và **icon** cùng nền `#131313`; vùng `fill` tabline là `#21222C`.
-
-Chi tiết kỹ thuật và bảng màu đầy đủ: mục [Color theme](#color-theme) phía trên.
-
----
-
 ## Customization
 
 - **Colors:** [`lua/core/colors.lua`](lua/core/colors.lua) (palette); [`lua/plugins/colortheme.lua`](lua/plugins/colortheme.lua) (Dracula overrides).
